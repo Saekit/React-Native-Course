@@ -4,10 +4,12 @@ import ListItem from "./src/components/ListItem";
 import PlaceInput from "./src/components/PlaceInput";
 import PlaceList from "./src/components/PlaceList";
 import placeImage from "./src/assets/japan.jpg";
+import PlaceDetail from "./src/components/PlaceDetail";
 
 export default class App extends Component {
   state = {
-    places: []
+    places: [],
+    selectedPlace: null
   };
 
   placeAddedHandler = placeName => {
@@ -22,21 +24,47 @@ export default class App extends Component {
     });
   };
 
-  placeDeleteHandler = key => {
+  placeSelectedHandler = key => {
     this.setState(prevState => {
       return {
-        places: prevState.places.filter(place => place.key !== key)
+        selectedPlace: prevState.places.find(place => {
+          return place.key === key;
+        })
       };
+    });
+  };
+
+  placeDeletedHandler = () => {
+    //to delete
+    this.setState(prevState => {
+      return {
+        places: prevState.places.filter(place => {
+          return place.key !== prevState.selectedPlace.key;
+        }),
+        selectedPlace: null
+      };
+    });
+  };
+
+  modalClosedHandler = () => {
+    //to close modal
+    this.setState({
+      selectedPlace: null
     });
   };
 
   render() {
     return (
       <View style={styles.container}>
+        <PlaceDetail
+          selectedPlace={this.state.selectedPlace}
+          onItemDeleted={this.placeDeletedHandler}
+          onModalClosed={this.modalClosedHandler}
+        />
         <PlaceInput onPlaceAdded={this.placeAddedHandler} />
         <PlaceList
           places={this.state.places}
-          onItemDeleted={this.placeDeleteHandler}
+          onItemSelected={this.placeSelectedHandler}
         />
       </View>
     );
